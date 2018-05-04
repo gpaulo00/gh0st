@@ -1,0 +1,13 @@
+
+[http]
+  address = ":8080"
+
+  # "release" in production
+  mode = "debug"
+
+[database]
+  address = "localhost:5432"
+  name = "gh0st"
+  user = "gh0st"
+  password = "1234"
+  # url = "postgres://gh0st:1234@localhost:5432/gh0st?sslmode=disable"

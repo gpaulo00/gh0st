@@ -7,7 +7,7 @@ import (
 	"net"
 	"os"
 
-	"bitbucket.org/gpaulo00/gh0st/common"
+	"github.com/gpaulo00/gh0st/common"
 )
 
 // Connection describes a Ncat connection, and implements IConnection.

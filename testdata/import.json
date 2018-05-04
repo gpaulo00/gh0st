@@ -1,0 +1,42 @@
+{
+  "source": {
+    "workspace": 1,
+    "generator": "nmap 7.20"
+  },
+  "hosts": [
+    {
+      "host": {
+        "address": "192.168.1.1"
+      },
+      "services": [
+        {
+          "port": 80,
+          "service": "http"
+        },
+        {
+          "port": 22,
+          "service": "ssh"
+        }
+      ],
+      "infos": [
+        {
+          "name": "gh0st",
+          "data": {
+            "owned": true
+          }
+        }
+      ]
+    },
+    {
+      "host": {
+        "address": "192.168.1.100"
+      },
+      "services": [
+        {
+          "port": 8080,
+          "service": "http proxy"
+        }
+      ]
+    }
+  ]
+}
