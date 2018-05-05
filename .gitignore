@@ -1,3 +1,6 @@
 
 # build
-dist/
+/dist/
+
+# testing data
+testdata/

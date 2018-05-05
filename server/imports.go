@@ -34,6 +34,11 @@ func (ctl *ImportController) Import(c *gin.Context) {
 			return err
 		}
 
+		// without hosts?
+		if len(form.Hosts) <= 0 {
+			return nil
+		}
+
 		// add hosts
 		for i := range form.Hosts {
 			host := &form.Hosts[i].Host
@@ -65,12 +70,19 @@ func (ctl *ImportController) Import(c *gin.Context) {
 		}
 
 		// add services & infos
-		if _, err := tx.Model(services...).Insert(); err != nil {
-			return err
+		if len(services) > 0 {
+			if _, err := tx.Model(services...).Insert(); err != nil {
+				return err
+			}
 		}
-		_, err := tx.Model(infos...).Insert()
 
-		return err
+		if len(infos) > 0 {
+			if _, err := tx.Model(infos...).Insert(); err != nil {
+				return err
+			}
+		}
+
+		return nil
 	})
 
 	// handle error

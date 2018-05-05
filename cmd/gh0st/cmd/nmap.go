@@ -22,28 +22,30 @@ var nmapCmd = &cobra.Command{
 	Short: "Import a Nmap XML scan",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// open file
-		fp, err := os.Open(args[0])
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		defer fp.Close()
+		printInfo(fmt.Sprintf("importing %d nmap scans", len(args)))
 
-		// parse nmap scan
-		imp, err := nmap.New().Parse(fp)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+		for i := range args {
+			// open file
+			fp, err := os.Open(args[i])
+			if err != nil {
+				printErr(err)
+			}
+			defer fp.Close()
+
+			// parse nmap scan
+			imp, err := nmap.New().Parse(fp)
+			if err != nil {
+				printErr(err)
+			}
+
+			// import to gh0st
+			res, err := client.Import(imp.Import(workspace))
+			if err != nil {
+				printErr(err)
+			}
+			printOK(res.String())
 		}
 
-		// import to gh0st
-		res, err := client.Import(imp.Import(workspace))
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		fmt.Println("successfully import nmap scan")
-		fmt.Println(res)
+		printOK("finish nmap import")
 	},
 }

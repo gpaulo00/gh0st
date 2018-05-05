@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/gpaulo00/gh0st/sdk"
-
 	"github.com/spf13/cobra"
 )
 
@@ -36,13 +36,12 @@ func init() {
 
 // start runs when initializing
 func start() {
-	fmt.Println("gh0st client")
+	printInfo(color.CyanString("gh0st client"))
 
 	// connect to gh0st
 	c, err := sdk.New(api)
 	if err != nil {
-		fmt.Printf("cannot connect to gh0st: %s\n", err.Error())
-		os.Exit(1)
+		printErr(err)
 	}
 	client = c
 }
