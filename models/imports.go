@@ -4,12 +4,15 @@ import "fmt"
 
 // ImportForm contains information about an imported source
 type ImportForm struct {
-	Source Source `json:"source" binding:"required"`
-	Hosts  []struct {
-		Host     Host      `json:"host" binding:"required"`
-		Infos    []Info    `json:"infos"`
-		Services []Service `json:"services"`
-	} `json:"hosts" binding:"required"`
+	Source Source       `json:"source" binding:"required"`
+	Hosts  []ImportHost `json:"hosts" binding:"required"`
+}
+
+// ImportHost contains information about an imported host
+type ImportHost struct {
+	Host     Host      `json:"host" binding:"required"`
+	Infos    []Info    `json:"infos"`
+	Services []Service `json:"services"`
 }
 
 // ImportResult is the result of an import

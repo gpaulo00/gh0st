@@ -52,10 +52,10 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".gh0st" (without extension).
+		// Search config in home directory with name ".gh0std" (without extension).
 		viper.AddConfigPath(".")
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".gh0st")
+		viper.SetConfigName(".gh0std")
 	}
 
 	// read env
