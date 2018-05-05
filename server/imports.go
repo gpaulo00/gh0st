@@ -3,30 +3,21 @@ package server
 import (
 	"net/http"
 
-	"github.com/gpaulo00/gh0st/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
+	"github.com/gpaulo00/gh0st/models"
 	log "github.com/sirupsen/logrus"
 )
 
 // ImportController is a HTTP controller to manage imports
 type ImportController struct{}
 
-type importForm struct {
-	Source models.Source `json:"source" binding:"required"`
-	Hosts  []struct {
-		Host     models.Host      `json:"host" binding:"required"`
-		Infos    []models.Info    `json:"infos"`
-		Services []models.Service `json:"services"`
-	} `json:"hosts" binding:"required"`
-}
-
 // Import inserts some data into the database
 func (ctl *ImportController) Import(c *gin.Context) {
 	// binding
-	var form importForm
+	var form models.ImportForm
 	if err := c.ShouldBindJSON(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, models.Error(err))
 		return
 	}
 
@@ -59,6 +50,7 @@ func (ctl *ImportController) Import(c *gin.Context) {
 			srv := form.Hosts[i].Services
 			inf := form.Hosts[i].Infos
 
+			// TODO: add concurrency
 			// parse services
 			for j := range srv {
 				srv[j].HostID = hostID
@@ -83,25 +75,21 @@ func (ctl *ImportController) Import(c *gin.Context) {
 
 	// handle error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, models.Error(err))
 		return
 	}
 
 	// result
-	log.Debugf(
-		"imported data: hosts = %d, services = %d, infos = %d",
-		len(hosts), len(services), len(infos),
-	)
-	c.JSON(http.StatusOK, gin.H{
-		"result": gin.H{
-			"hosts":    len(hosts),
-			"services": len(services),
-			"infos":    len(infos),
-		},
-	})
+	result := models.ImportResult{
+		Hosts:    len(hosts),
+		Services: len(services),
+		Infos:    len(infos),
+	}
+	log.Debug(result.String())
+	c.JSON(http.StatusOK, result)
 }
 
 // Route configures gin to route the controller
 func (ctl *ImportController) Route(r gin.IRouter) {
-	r.POST("/import", ctl.Import)
+	r.POST(models.ImportPath, ctl.Import)
 }

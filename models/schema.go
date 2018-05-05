@@ -16,18 +16,16 @@ type Workspace struct {
 
 // Source is the source of data
 type Source struct {
-	ID          uint64     `json:"id"`
-	WorkspaceID uint64     `sql:"workspace_id" json:"workspace" binding:"required"`
-	Workspace   *Workspace `json:"-" binding:"-"`
-	Generator   string     `json:"generator" binding:"required"`
-	CreatedAt   time.Time  `sql:"default:now()" json:"createdAt"`
+	ID          uint64    `json:"id"`
+	WorkspaceID uint64    `sql:"workspace_id" json:"workspace" binding:"required"`
+	Generator   string    `json:"generator" binding:"required"`
+	CreatedAt   time.Time `sql:"default:now()" json:"createdAt"`
 }
 
 // Host is a target of data
 type Host struct {
 	ID        uint64    `json:"id"`
 	SourceID  uint64    `sql:"source_id" json:"source"`
-	Source    *Source   `json:"-" binding:"-"`
 	Address   net.IP    `json:"address" binding:"required"`
 	CreatedAt time.Time `sql:"default:now()" json:"createdAt"`
 }
@@ -36,7 +34,6 @@ type Host struct {
 type Service struct {
 	ID        uint64    `json:"id"`
 	HostID    uint64    `sql:"host_id" json:"host"`
-	Host      *Host     `json:"-" binding:"-"`
 	Port      uint16    `json:"port" binding:"required"`
 	Service   string    `json:"service" binding:"required"`
 	CreatedAt time.Time `sql:"default:now()" json:"createdAt"`
@@ -46,7 +43,6 @@ type Service struct {
 type Info struct {
 	ID        uint64                 `json:"id"`
 	HostID    uint64                 `sql:"host_id" json:"host"`
-	Host      *Host                  `json:"-" binding:"-"`
 	Name      string                 `json:"name" binding:"required"`
 	Data      map[string]interface{} `json:"data" binding:"required"`
 	CreatedAt time.Time              `sql:"default:now()" json:"createdAt"`
