@@ -10,4 +10,3 @@
   name = "gh0st"
   user = "gh0st"
   password = "1234"
-  # url = "postgres://gh0st:1234@localhost:5432/gh0st?sslmode=disable"
