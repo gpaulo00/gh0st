@@ -34,7 +34,9 @@ func parseID(c *gin.Context) (uint64, error) {
 // Server creates a HTTP server
 func Server() {
 	// set mode
-	if mode := viper.GetString("http.mode"); mode != "" {
+	if models.Version != "develop" {
+		gin.SetMode(gin.ReleaseMode)
+	} else if mode := viper.GetString("http.mode"); mode != "" {
 		gin.SetMode(mode)
 	}
 

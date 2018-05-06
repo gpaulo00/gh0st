@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/gpaulo00/gh0st/models"
 	"github.com/gpaulo00/gh0st/sdk"
 	"github.com/spf13/cobra"
 )
@@ -16,8 +17,9 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "gh0st",
-	Short: "RESTful API client for gh0st",
+	Use:     "gh0st",
+	Short:   "RESTful API client for gh0st",
+	Version: models.Version,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -36,7 +38,7 @@ func init() {
 
 // start runs when initializing
 func start() {
-	printInfo(color.CyanString("gh0st client"))
+	printInfo(color.CyanString("gh0st client (version %s)", models.Version))
 
 	// connect to gh0st
 	c, err := sdk.New(api)

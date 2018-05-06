@@ -17,8 +17,9 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "gh0std",
-	Short: "Simple and lightweight reporting framework",
+	Use:     "gh0std",
+	Short:   "Simple and lightweight reporting framework",
+	Version: models.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		// connect to database
 		if err := models.ConfigureDB(); err != nil {
@@ -39,7 +40,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	log.Info("starting gh0st")
+	log.Infof("gh0st server (version %s)", models.Version)
 
 	if cfgFile != "" {
 		// Use config file from the flag.
