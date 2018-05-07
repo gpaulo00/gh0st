@@ -51,14 +51,35 @@ COMMENT ON COLUMN "services"."protocol" IS 'service protocol (tcp, etc.)';
 COMMENT ON COLUMN "services"."port" IS 'service port';
 COMMENT ON COLUMN "services"."state" IS 'service status';
 
--- infos
-CREATE TABLE "infos" (
+-- notes
+CREATE TABLE "notes" (
   "id"            bigserial PRIMARY KEY,
   "host_id"       bigint NOT NULL REFERENCES "hosts" ("id") ON DELETE CASCADE,
-  "name"          text NOT NULL,
-  "data"          jsonb NOT NULL,
+  "title"         text NOT NULL,
+  "content"       text NOT NULL,
   "created_at"    timestamp with time zone NOT NULL DEFAULT now()
 );
-COMMENT ON TABLE "infos" IS 'extra information of a host';
-COMMENT ON COLUMN "infos"."name" IS 'information name';
-COMMENT ON COLUMN "infos"."data" IS 'schema-less data';
+COMMENT ON TABLE "notes" IS 'extra information of a host';
+COMMENT ON COLUMN "notes"."title" IS 'information name';
+COMMENT ON COLUMN "notes"."content" IS 'note content';
+
+-- issues
+CREATE TYPE issue_level AS ENUM (
+  'critical',
+  'high',
+  'medium',
+  'low',
+  'info'
+);
+CREATE TABLE "issues" (
+  "id"            bigserial PRIMARY KEY,
+  "host_id"       bigint NOT NULL REFERENCES "hosts" ("id") ON DELETE CASCADE,
+  "level"         issue_level NOT NULL,
+  "title"         text NOT NULL,
+  "content"       text NOT NULL,
+  "created_at"    timestamp with time zone NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE "issues" IS 'issues of a host';
+COMMENT ON COLUMN "issues"."level" IS 'issue level';
+COMMENT ON COLUMN "issues"."title" IS 'issue name';
+COMMENT ON COLUMN "issues"."content" IS 'issue content';

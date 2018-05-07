@@ -11,7 +11,8 @@ type ImportForm struct {
 // ImportHost contains information about an imported host
 type ImportHost struct {
 	Host     Host      `json:"host" binding:"required"`
-	Infos    []Info    `json:"infos"`
+	Notes    []Note    `json:"notes"`
+	Issues   []Issue   `json:"issues"`
 	Services []Service `json:"services"`
 }
 
@@ -19,12 +20,13 @@ type ImportHost struct {
 type ImportResult struct {
 	Hosts    int `json:"hosts"`
 	Services int `json:"services"`
-	Infos    int `json:"infos"`
+	Notes    int `json:"notes"`
+	Issues   int `json:"issues"`
 }
 
 func (i ImportResult) String() string {
 	return fmt.Sprintf(
-		"imported data: hosts = %d, services = %d, infos = %d",
-		i.Hosts, i.Services, i.Infos,
+		"imported data: hosts = %d, services = %d, notes = %d, issues = %d",
+		i.Hosts, i.Services, i.Notes, i.Issues,
 	)
 }

@@ -39,7 +39,8 @@ var nmapCmd = &cobra.Command{
 			}
 
 			// import to gh0st
-			res, err := client.Import(imp.Import(workspace))
+			data := imp.Import(workspace)
+			res, err := client.Import(data)
 			if err != nil {
 				printErr(err)
 			}

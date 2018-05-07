@@ -24,7 +24,8 @@ func (ctl *ImportController) Import(c *gin.Context) {
 	// variables
 	hosts := make([]interface{}, len(form.Hosts))
 	var services []interface{}
-	var infos []interface{}
+	var notes []interface{}
+	var issues []interface{}
 
 	// transaction
 	db := models.DB()
@@ -49,35 +50,45 @@ func (ctl *ImportController) Import(c *gin.Context) {
 			return err
 		}
 
-		// parse services & infos
+		// parse services, notes & issues
 		for i := range form.Hosts {
 			hostID := hosts[i].(*models.Host).ID
-			srv := form.Hosts[i].Services
-			inf := form.Hosts[i].Infos
 
 			// TODO: add concurrency
 			// parse services
-			for j := range srv {
-				srv[j].HostID = hostID
-				services = append(services, &srv[j])
+			for _, srv := range form.Hosts[i].Services {
+				srv.HostID = hostID
+				services = append(services, &srv)
 			}
 
-			// parse infos
-			for j := range inf {
-				inf[j].HostID = hostID
-				infos = append(infos, &inf[j])
+			// parse notes
+			for _, note := range form.Hosts[i].Notes {
+				note.HostID = hostID
+				notes = append(notes, &note)
+			}
+
+			// parse issues
+			for _, issue := range form.Hosts[i].Issues {
+				issue.HostID = hostID
+				issues = append(issues, &issue)
 			}
 		}
 
-		// add services & infos
+		// add services, notes & issues
 		if len(services) > 0 {
 			if _, err := tx.Model(services...).Insert(); err != nil {
 				return err
 			}
 		}
 
-		if len(infos) > 0 {
-			if _, err := tx.Model(infos...).Insert(); err != nil {
+		if len(notes) > 0 {
+			if _, err := tx.Model(notes...).Insert(); err != nil {
+				return err
+			}
+		}
+
+		if len(issues) > 0 {
+			if _, err := tx.Model(issues...).Insert(); err != nil {
 				return err
 			}
 		}
@@ -95,7 +106,8 @@ func (ctl *ImportController) Import(c *gin.Context) {
 	result := models.ImportResult{
 		Hosts:    len(hosts),
 		Services: len(services),
-		Infos:    len(infos),
+		Notes:    len(notes),
+		Issues:   len(issues),
 	}
 	log.Debug(result.String())
 	c.JSON(http.StatusOK, result)

@@ -31,8 +31,11 @@ const HostPath = HTTPRoute("/hosts")
 // ServicePath is the HTTP path to manage services
 const ServicePath = HTTPRoute("/services")
 
-// InfoPath is the HTTP path to manage infos
-const InfoPath = HTTPRoute("/infos")
+// NotePath is the HTTP path to manage notes
+const NotePath = HTTPRoute("/notes")
+
+// IssuePath is the HTTP path to manage issues
+const IssuePath = HTTPRoute("/issues")
 
 // ImportPath is the HTTP path to import data
 const ImportPath = "/import"

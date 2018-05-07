@@ -46,7 +46,8 @@ func Server() {
 	new(HostController).Route(r)
 	new(SourceController).Route(r)
 	new(ServiceController).Route(r)
-	new(InfoController).Route(r)
+	new(NoteController).Route(r)
+	new(IssueController).Route(r)
 	new(ImportController).Route(r)
 
 	// http server

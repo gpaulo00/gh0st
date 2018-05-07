@@ -6,12 +6,8 @@ package nmap
 import (
 	"encoding/xml"
 	"fmt"
-	"io"
-	"net"
 	"strconv"
 	"time"
-
-	"github.com/gpaulo00/gh0st/models"
 )
 
 // Timestamp is a parsed time.Time from xml
@@ -172,6 +168,13 @@ type Service struct {
 	CPEs       []CPE  `xml:"cpe"`
 }
 
+func (s Service) String() string {
+	if s.Product == "" && s.Version == "" {
+		return "unknown"
+	}
+	return fmt.Sprintf("%s %s", s.Product, s.Version)
+}
+
 // CPE (Common Platform Enumeration) is a standardized way to name software
 // applications, operating systems, and hardware platforms.
 type CPE string
@@ -226,86 +229,4 @@ type Hop struct {
 	RTT    float32 `xml:"rtt,attr" json:"rtt"`
 	IPAddr string  `xml:"ipaddr,attr" json:"address"`
 	Host   string  `xml:"host,attr" json:"host"`
-}
-
-// Import returns an gh0st-importable struct
-func (r *Root) Import(ws uint64) *models.ImportForm {
-	at := time.Time(r.Start)
-	hosts := []models.ImportHost{}
-	for _, host := range r.Hosts {
-		if len(host.Addresses) < 1 {
-			continue
-		}
-
-		// parse address
-		ip := net.ParseIP(host.Addresses[0].Addr)
-		if ip == nil {
-			continue
-		}
-		h := models.Host{Address: ip, State: host.Status.State}
-
-		// services
-		services := []models.Service{}
-		for _, port := range host.Ports {
-			srv := models.Service{
-				Protocol: port.Protocol,
-				Port:     port.PortID,
-				State:    port.State.State,
-				Service:  &port.Service.Name,
-			}
-			services = append(services, srv)
-		}
-
-		// infos
-		info := models.Info{
-			Name: "nmap data",
-			Data: models.JSON{
-				"comment":  host.Comment,
-				"uptime":   host.Uptime.Seconds,
-				"os":       host.Os.OsMatches,
-				"distance": host.Distance.Value,
-				"trace":    host.Trace,
-			},
-		}
-
-		// append
-		hosts = append(hosts, models.ImportHost{
-			Host:     h,
-			Services: services,
-			Infos:    []models.Info{info},
-		})
-	}
-
-	result := &models.ImportForm{
-		Source: models.Source{
-			WorkspaceID: ws,
-			Generator:   fmt.Sprintf("%s %s", r.Scanner, r.Version),
-			GeneratedAt: &at,
-			SourceInfo: &models.JSON{
-				"arguments": r.Args,
-				"type":      r.ScanInfo.Type,
-				"verbose":   r.Verbose.Level,
-				"debug":     r.Debugging.Level,
-			},
-		},
-		Hosts: hosts,
-	}
-	return result
-}
-
-// Integration defines how to import a Nmap scan into gh0st
-type Integration struct{}
-
-// Parse makes a *Root element from an io.Reader
-func (n *Integration) Parse(r io.Reader) (*Root, error) {
-	res := new(Root)
-	if err := xml.NewDecoder(r).Decode(res); err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-// New returns a nmap integration api.
-func New() *Integration {
-	return &Integration{}
 }

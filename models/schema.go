@@ -47,14 +47,44 @@ type Service struct {
 	CreatedAt time.Time `sql:"default:now()" json:"createdAt,omitempty"`
 }
 
-// Info is an extra information of a host
-type Info struct {
+// Note is an extra information of a host
+type Note struct {
 	ID        uint64    `json:"id,omitempty"`
 	HostID    uint64    `sql:"host_id" json:"host"`
-	Name      string    `json:"name" binding:"required"`
-	Data      JSON      `json:"data" binding:"required"`
+	Title     string    `json:"title" binding:"required"`
+	Content   string    `json:"content" binding:"required"`
 	CreatedAt time.Time `sql:"default:now()" json:"createdAt,omitempty"`
 }
+
+// Issue represents an issue in a host
+type Issue struct {
+	ID        uint64    `json:"id,omitempty"`
+	HostID    uint64    `sql:"host_id" json:"host"`
+	Level     string    `json:"level" binding:"required"`
+	Title     string    `json:"title" binding:"required"`
+	Content   string    `json:"content" binding:"required"`
+	CreatedAt time.Time `sql:"default:now()" json:"createdAt,omitempty"`
+}
+
+// IssueLevel represents the level of an issue
+type IssueLevel string
+
+const (
+	// CriticalIssue is the "critical" level of an issue
+	CriticalIssue = IssueLevel("critical")
+
+	// HighIssue is the "high" level of an issue
+	HighIssue = IssueLevel("high")
+
+	// MediumIssue is the "medium" level of an issue
+	MediumIssue = IssueLevel("medium")
+
+	// LowIssue is the "low" level of an issue
+	LowIssue = IssueLevel("low")
+
+	// InfoIssue is the "info" level of an issue
+	InfoIssue = IssueLevel("info")
+)
 
 // BeforeInsert hooks before add a new source
 func (z *Source) BeforeInsert(db orm.DB) error {
@@ -88,8 +118,16 @@ func (z *Service) BeforeInsert(db orm.DB) error {
 	return nil
 }
 
-// BeforeInsert hooks before add a new information
-func (z *Info) BeforeInsert(db orm.DB) error {
+// BeforeInsert hooks before add a new note
+func (z *Note) BeforeInsert(db orm.DB) error {
+	if z.CreatedAt.IsZero() {
+		z.CreatedAt = time.Now()
+	}
+	return nil
+}
+
+// BeforeInsert hooks before add a new issue
+func (z *Issue) BeforeInsert(db orm.DB) error {
 	if z.CreatedAt.IsZero() {
 		z.CreatedAt = time.Now()
 	}
