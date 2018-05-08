@@ -24,7 +24,7 @@ func parseID(c *gin.Context) (uint64, error) {
 	// parse id
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResult{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, Error(err))
 		return 0, err
 	}
 

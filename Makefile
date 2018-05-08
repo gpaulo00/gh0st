@@ -9,11 +9,9 @@ LDFLAGS := -ldflags "-X=$(PACKAGE)/models.Version=$(VERSION)"
 .PHONY : build install
 
 build:
-	go build $(LDFLAGS) -o dist/gh0std ./cmd/gh0std
-	go build $(LDFLAGS) -o dist/gh0st ./cmd/gh0st
+	go build $(LDFLAGS) -o dist/gh0st ./main.go
 
 install:
-	go install $(LDFLAGS) ./cmd/gh0std
-	go install $(LDFLAGS) ./cmd/gh0st
+	go install $(LDFLAGS) ./main.go
 
 default: build
