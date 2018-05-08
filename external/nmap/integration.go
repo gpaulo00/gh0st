@@ -129,7 +129,7 @@ func (r *Root) Import(ws uint64) *models.ImportForm {
 			}
 			single.Issues = []models.Issue{models.Issue{
 				Title:   fmt.Sprintf("Nmap scan of %s", h.Address),
-				Level:   string(models.LowIssue),
+				Level:   models.LowIssue,
 				Content: buf.String(),
 			}}
 		}

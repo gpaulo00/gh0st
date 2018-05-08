@@ -1,7 +1,9 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
@@ -11,6 +13,15 @@ import (
 
 // ImportController is a HTTP controller to manage imports
 type ImportController struct{}
+
+func (ctl *ImportController) insertMany(tx *pg.Tx, input []interface{}) error {
+	if len(input) > 0 {
+		if _, err := tx.Model(input...).Insert(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // Import inserts some data into the database
 func (ctl *ImportController) Import(c *gin.Context) {
@@ -23,9 +34,11 @@ func (ctl *ImportController) Import(c *gin.Context) {
 
 	// variables
 	hosts := make([]interface{}, len(form.Hosts))
-	var services []interface{}
-	var notes []interface{}
-	var issues []interface{}
+	var (
+		services []interface{}
+		notes    []interface{}
+		issues   []interface{}
+	)
 
 	// transaction
 	db := models.DB()
@@ -53,47 +66,50 @@ func (ctl *ImportController) Import(c *gin.Context) {
 		// parse services, notes & issues
 		for i := range form.Hosts {
 			hostID := hosts[i].(*models.Host).ID
+			var wg sync.WaitGroup
 
-			// TODO: add concurrency
 			// parse services
-			for _, srv := range form.Hosts[i].Services {
-				srv.HostID = hostID
-				services = append(services, &srv)
-			}
+			go func(i []models.Service) {
+				wg.Add(1)
+				defer wg.Done()
+				for _, srv := range i {
+					srv.HostID = hostID
+					services = append(services, &srv)
+				}
+			}(form.Hosts[i].Services)
 
 			// parse notes
-			for _, note := range form.Hosts[i].Notes {
-				note.HostID = hostID
-				notes = append(notes, &note)
-			}
+			go func(i []models.Note) {
+				wg.Add(1)
+				defer wg.Done()
+				for _, note := range i {
+					note.HostID = hostID
+					notes = append(notes, &note)
+				}
+			}(form.Hosts[i].Notes)
 
 			// parse issues
-			for _, issue := range form.Hosts[i].Issues {
-				issue.HostID = hostID
-				issues = append(issues, &issue)
-			}
+			go func(i []models.Issue) {
+				wg.Add(1)
+				defer wg.Done()
+				for _, issue := range i {
+					issue.HostID = hostID
+					issues = append(issues, &issue)
+					fmt.Println(issues)
+				}
+			}(form.Hosts[i].Issues)
+
+			wg.Wait()
 		}
 
 		// add services, notes & issues
-		if len(services) > 0 {
-			if _, err := tx.Model(services...).Insert(); err != nil {
-				return err
-			}
+		if err := ctl.insertMany(tx, services); err != nil {
+			return err
 		}
-
-		if len(notes) > 0 {
-			if _, err := tx.Model(notes...).Insert(); err != nil {
-				return err
-			}
+		if err := ctl.insertMany(tx, notes); err != nil {
+			return err
 		}
-
-		if len(issues) > 0 {
-			if _, err := tx.Model(issues...).Insert(); err != nil {
-				return err
-			}
-		}
-
-		return nil
+		return ctl.insertMany(tx, issues)
 	})
 
 	// handle error

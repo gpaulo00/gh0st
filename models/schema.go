@@ -3,8 +3,6 @@ package models
 import (
 	"net"
 	"time"
-
-	"github.com/go-pg/pg/orm"
 )
 
 // JSON represents schema-less data in the database
@@ -58,12 +56,12 @@ type Note struct {
 
 // Issue represents an issue in a host
 type Issue struct {
-	ID        uint64    `json:"id,omitempty"`
-	HostID    uint64    `sql:"host_id" json:"host"`
-	Level     string    `json:"level" binding:"required"`
-	Title     string    `json:"title" binding:"required"`
-	Content   string    `json:"content" binding:"required"`
-	CreatedAt time.Time `sql:"default:now()" json:"createdAt,omitempty"`
+	ID        uint64     `json:"id,omitempty"`
+	HostID    uint64     `sql:"host_id" json:"host"`
+	Level     IssueLevel `json:"level" binding:"required"`
+	Title     string     `json:"title" binding:"required"`
+	Content   string     `json:"content" binding:"required"`
+	CreatedAt time.Time  `sql:"default:now()" json:"createdAt,omitempty"`
 }
 
 // IssueLevel represents the level of an issue
@@ -85,51 +83,3 @@ const (
 	// InfoIssue is the "info" level of an issue
 	InfoIssue = IssueLevel("info")
 )
-
-// BeforeInsert hooks before add a new source
-func (z *Source) BeforeInsert(db orm.DB) error {
-	if z.CreatedAt.IsZero() {
-		z.CreatedAt = time.Now()
-	}
-	return nil
-}
-
-// BeforeInsert hooks before add a new workspace
-func (z *Workspace) BeforeInsert(db orm.DB) error {
-	if z.CreatedAt.IsZero() {
-		z.CreatedAt = time.Now()
-	}
-	return nil
-}
-
-// BeforeInsert hooks before add a new host
-func (z *Host) BeforeInsert(db orm.DB) error {
-	if z.CreatedAt.IsZero() {
-		z.CreatedAt = time.Now()
-	}
-	return nil
-}
-
-// BeforeInsert hooks before add a new service
-func (z *Service) BeforeInsert(db orm.DB) error {
-	if z.CreatedAt.IsZero() {
-		z.CreatedAt = time.Now()
-	}
-	return nil
-}
-
-// BeforeInsert hooks before add a new note
-func (z *Note) BeforeInsert(db orm.DB) error {
-	if z.CreatedAt.IsZero() {
-		z.CreatedAt = time.Now()
-	}
-	return nil
-}
-
-// BeforeInsert hooks before add a new issue
-func (z *Issue) BeforeInsert(db orm.DB) error {
-	if z.CreatedAt.IsZero() {
-		z.CreatedAt = time.Now()
-	}
-	return nil
-}
