@@ -49,6 +49,7 @@ func Server() {
 	new(NoteController).Route(r)
 	new(IssueController).Route(r)
 	new(ImportController).Route(r)
+	new(StatController).Route(r)
 
 	// http server
 	address := viper.GetString("http.address")

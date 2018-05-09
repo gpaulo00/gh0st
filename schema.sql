@@ -83,3 +83,18 @@ COMMENT ON TABLE "issues" IS 'issues of a host';
 COMMENT ON COLUMN "issues"."level" IS 'issue level';
 COMMENT ON COLUMN "issues"."title" IS 'issue name';
 COMMENT ON COLUMN "issues"."content" IS 'issue content';
+
+-- stats
+CREATE VIEW "issues_stats" AS
+  SELECT
+    -- an id to make go-pg happy
+    1 AS "id",
+
+    -- count of issues by level
+    COUNT(*) FILTER (WHERE "i"."level" = 'info') AS "info",
+    COUNT(*) FILTER (WHERE "i"."level" = 'low') AS "low",
+    COUNT(*) FILTER (WHERE "i"."level" = 'medium') AS "medium",
+    COUNT(*) FILTER (WHERE "i"."level" = 'high') AS "high",
+    COUNT(*) FILTER (WHERE "i"."level" = 'critical') AS "critical"
+  FROM "issues" AS "i";
+COMMENT ON VIEW "issues_stats" IS 'show number of issues by level';
