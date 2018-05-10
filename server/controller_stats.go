@@ -14,13 +14,14 @@ type StatController struct{}
 func (ctl *StatController) Issues(c *gin.Context) {
 	// initialize
 	db := models.DB()
-	var stats models.IssuesStats
+	var res models.IssuesSummary
 
-	if err := db.Model(&stats).Select(); err != nil {
-		c.JSON(http.StatusOK, Error(err))
+	if err := db.Model(&res).Select(); err != nil {
+		c.JSON(http.StatusInternalServerError, Error(err))
 		return
 	}
-	c.JSON(http.StatusOK, stats)
+
+	c.JSON(http.StatusOK, res)
 }
 
 // Route configures gin to route the controller

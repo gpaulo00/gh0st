@@ -85,16 +85,37 @@ COMMENT ON COLUMN "issues"."title" IS 'issue name';
 COMMENT ON COLUMN "issues"."content" IS 'issue content';
 
 -- stats
-CREATE VIEW "issues_stats" AS
+CREATE VIEW "issues_summaries" AS
+  WITH
+    "counts" AS (
+      SELECT
+        -- count of issues by level
+        COUNT(*) FILTER (WHERE "i"."level" = 'info') AS "info",
+        COUNT(*) FILTER (WHERE "i"."level" = 'low') AS "low",
+        COUNT(*) FILTER (WHERE "i"."level" = 'medium') AS "medium",
+        COUNT(*) FILTER (WHERE "i"."level" = 'high') AS "high",
+        COUNT(*) FILTER (WHERE "i"."level" = 'critical') AS "critical"
+      FROM "issues" AS "i"
+    ),
+    "titles" AS (
+      -- top 10 issues titles
+      SELECT
+        "title", "level",
+        COUNT("id") AS "number"
+      FROM "issues"
+      GROUP BY "title", "level"
+      ORDER BY "level", "number" DESC
+      LIMIT 10
+    )
   SELECT
     -- an id to make go-pg happy
-    1 AS "id",
+    1 as "id",
 
-    -- count of issues by level
-    COUNT(*) FILTER (WHERE "i"."level" = 'info') AS "info",
-    COUNT(*) FILTER (WHERE "i"."level" = 'low') AS "low",
-    COUNT(*) FILTER (WHERE "i"."level" = 'medium') AS "medium",
-    COUNT(*) FILTER (WHERE "i"."level" = 'high') AS "high",
-    COUNT(*) FILTER (WHERE "i"."level" = 'critical') AS "critical"
-  FROM "issues" AS "i";
-COMMENT ON VIEW "issues_stats" IS 'show number of issues by level';
+    -- see "counts"
+    ROW_TO_JSON("counts") AS "stats",
+
+    -- see "titles"
+    JSON_AGG(ROW_TO_JSON("titles")) AS "titles"
+  FROM "counts", "titles"
+  GROUP BY "counts".*;
+COMMENT ON VIEW "issues_summaries" IS 'summary of issues with stats';
