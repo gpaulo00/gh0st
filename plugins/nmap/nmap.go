@@ -55,6 +55,9 @@ type Root struct {
 	Verbose   Verbose   `xml:"verbose"`
 	Debugging Debugging `xml:"debugging"`
 
+	// extra
+	ProfileName string `xml:"profile_name,attr"`
+
 	// hosts
 	Hosts []Host `xml:"host"`
 }
@@ -96,6 +99,41 @@ type Host struct {
 	Distance  Distance   `xml:"distance"`
 	Uptime    Uptime     `xml:"uptime"`
 	Trace     Trace      `xml:"trace"`
+
+	// extra
+	TCPSequence  TCPSequence  `xml:"tcpsequence"`
+	IPIDSequence IPIDSequence `xml:"ipidsequence"`
+	HostScripts  []Script     `xml:"hostscript>script"`
+}
+
+// TCPSequence contains information regarding the detected tcp sequence.
+type TCPSequence struct {
+	Index      int    `xml:"index,attr"`
+	Difficulty string `xml:"difficulty,attr"`
+	Values     string `xml:"values,attr"`
+}
+
+// Sequence contains information regarding the detected X sequence.
+type Sequence struct {
+	Class  string `xml:"class,attr"`
+	Values string `xml:"values,attr"`
+}
+
+// IPIDSequence contains info about the ipid sequence
+type IPIDSequence Sequence
+
+// Script contains information from Nmap Scripting Engine.
+type Script struct {
+	ID     string  `xml:"id,attr"`
+	Output string  `xml:"output,attr"`
+	Tables []Table `xml:"table"`
+}
+
+// Table contains the output of the script in a more parse-able form.
+// ToDo: This should be a map[string][]string
+type Table struct {
+	Key      string   `xml:"key,attr"`
+	Elements []string `xml:"elem"`
 }
 
 // Status is the host's status. Up, down, etc.
@@ -195,9 +233,9 @@ type PortUsed struct {
 
 // OsMatch contains detailed information regarding a Os fingerprint.
 type OsMatch struct {
-	Name     string `xml:"name,attr" json:"name"`
-	Accuracy string `xml:"accuracy,attr" json:"accuracy"`
-	Line     string `xml:"line,attr" json:"-"`
+	Name     string `xml:"name,attr"`
+	Accuracy string `xml:"accuracy,attr"`
+	Line     string `xml:"line,attr" `
 }
 
 // OsFingerprint is the actual fingerprint string.
@@ -218,15 +256,15 @@ type Uptime struct {
 
 // Trace contains the hops to a Host.
 type Trace struct {
-	Proto string `xml:"proto,attr" json:"proto"`
-	Port  int    `xml:"port,attr" json:"port"`
-	Hops  []Hop  `xml:"hop" json:"hops"`
+	Proto string `xml:"proto,attr"`
+	Port  int    `xml:"port,attr"`
+	Hops  []Hop  `xml:"hop"`
 }
 
 // Hop is a ip hop to a Host.
 type Hop struct {
-	TTL    float32 `xml:"ttl,attr" json:"ttl"`
-	RTT    float32 `xml:"rtt,attr" json:"rtt"`
-	IPAddr string  `xml:"ipaddr,attr" json:"address"`
-	Host   string  `xml:"host,attr" json:"host"`
+	TTL    float32 `xml:"ttl,attr"`
+	RTT    float32 `xml:"rtt,attr"`
+	IPAddr string  `xml:"ipaddr,attr"`
+	Host   string  `xml:"host,attr"`
 }

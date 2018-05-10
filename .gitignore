@@ -14,3 +14,6 @@
 
 # testing data
 testdata/
+
+# editors
+/.vscode/

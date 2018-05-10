@@ -6,12 +6,18 @@ VERSION := $(shell git describe --always --all)
 PACKAGE := github.com/gpaulo00/gh0st
 LDFLAGS := -ldflags "-X=$(PACKAGE)/models.Version=$(VERSION)"
 
-.PHONY : build install
+.PHONY : build install tools
 
-build:
-	go build $(LDFLAGS) -o dist/gh0st ./main.go
+tools:
+	go get -u github.com/gobuffalo/packr/...
 
-install:
-	go install $(LDFLAGS) ./main.go
+build: tools
+	packr build $(LDFLAGS) -o dist/gh0st ./main.go
+
+install: tools
+	packr install $(LDFLAGS) ./main.go
+
+clean:
+	rm -rf dist/
 
 default: build
