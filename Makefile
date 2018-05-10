@@ -11,10 +11,10 @@ LDFLAGS := -ldflags "-X=$(PACKAGE)/models.Version=$(VERSION)"
 tools:
 	go get -u github.com/gobuffalo/packr/...
 
-build: tools
+build:
 	packr build $(LDFLAGS) -o dist/gh0st ./main.go
 
-install: tools
+install:
 	packr install $(LDFLAGS) ./main.go
 
 clean:

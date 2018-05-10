@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/orm"
 	"github.com/gpaulo00/gh0st/models"
 )
 
@@ -13,7 +14,11 @@ type IssueController struct{}
 // List returns a list of all Issues
 func (ctl *IssueController) List(c *gin.Context) {
 	w := []models.Issue{}
-	if err := models.DB().Model(&w).Select(); err != nil {
+	err := models.DB().Model(&w).
+		Apply(orm.Pagination(c.Request.URL.Query())).
+		Order("level", "created_at DESC").
+		Select()
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, Error(err))
 		return
 	}

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/orm"
 	"github.com/gpaulo00/gh0st/models"
 )
 
@@ -13,7 +14,10 @@ type ServiceController struct{}
 // List returns a list of all Services
 func (ctl *ServiceController) List(c *gin.Context) {
 	w := []models.Service{}
-	if err := models.DB().Model(&w).Select(); err != nil {
+	err := models.DB().Model(&w).
+		Apply(orm.Pagination(c.Request.URL.Query())).
+		Select()
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, Error(err))
 		return
 	}
